@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"io/ioutil"
+	"strings"
 	"testing"
 )
 
@@ -31,19 +32,38 @@ func hexDecode(t *testing.T, s string) []byte {
 	}
 	return v
 }
-func corpusFromFile(t *testing.T, name string) map[rune]float64 {
+
+var corpus = corpusFromFile("_testdata/alice.txt")
+
+func corpusFromFile(name string) map[rune]float64 {
 	v, err := ioutil.ReadFile(name)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	c := buildCorpus(string(v))
 	return c
 }
 func TestProblem3(t *testing.T) {
-	c := corpusFromFile(t, "_testdata/alice.txt")
-	for char, val := range c {
+	for char, val := range corpus {
 		t.Logf("%c:%.5f", char, val)
 	}
-	res := findSingleXORKey(hexDecode(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"), c)
+	res, _ := findSingleXORKey(hexDecode(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"), corpus)
 	t.Logf("%s", string(res))
+}
+func TestProblem4(t *testing.T) {
+	text, err := ioutil.ReadFile("4.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var lastScore float64
+	var res []byte
+	for _, line := range strings.Split(string(text), "\n") {
+		line := hexDecode(t, line)
+		out, score := findSingleXORKey(line, corpus)
+		if score > lastScore {
+			res = out
+			lastScore = score
+		}
+	}
+	t.Logf("%s", res)
 }

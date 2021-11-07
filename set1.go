@@ -52,7 +52,7 @@ func singleXOR(in []byte, key byte) []byte {
 	}
 	return res
 }
-func findSingleXORKey(in []byte, c map[rune]float64) []byte {
+func findSingleXORKey(in []byte, c map[rune]float64) ([]byte, float64) {
 	var res []byte
 	var lastScore float64
 	for key := 0; key < 256; key++ {
@@ -63,5 +63,5 @@ func findSingleXORKey(in []byte, c map[rune]float64) []byte {
 			lastScore = score
 		}
 	}
-	return res
+	return res, lastScore
 }
