@@ -54,18 +54,18 @@ func singleXOR(in []byte, key byte) []byte {
 	}
 	return res
 }
-func findSingleXORKey(in []byte, c map[rune]float64) ([]byte, float64) {
-	var res []byte
-	var bestScore float64
-	for key := 0; key < 256; key++ {
-		out := singleXOR(in, byte(key))
-		score := scoreEnglish(string(out), c)
-		if score > bestScore {
+func findSingleXORKey(in []byte, c map[rune]float64) (res []byte, key byte, score float64) {
+
+	for k := 0; k < 256; k++ {
+		out := singleXOR(in, byte(k))
+		s := scoreEnglish(string(out), c)
+		if s > score {
 			res = out
-			bestScore = score
+			score = s
+			key = byte(k)
 		}
 	}
-	return res, bestScore
+	return res, key, score
 }
 
 func repeatingXOR(in, key []byte) []byte {
@@ -91,7 +91,7 @@ func findRepeatXORSize(in []byte) int {
 	var res int
 	var bestScore float64 = math.MaxFloat64
 	for keyLen := 2; keyLen < 40; keyLen++ {
-		a, b := in[:keyLen*5], in[keyLen*5:keyLen*10]
+		a, b := in[:keyLen*15], in[keyLen*15:keyLen*15*2]
 		score := float64(hammingDistance(a, b)) / float64(keyLen)
 		if score < bestScore {
 			res = keyLen
@@ -99,4 +99,21 @@ func findRepeatXORSize(in []byte) int {
 		}
 	}
 	return res
+}
+
+func findRepeatXORKey(in []byte, c map[rune]float64) []byte {
+	keySize := findRepeatXORSize(in)
+	column := make([]byte, len(in)/keySize)
+	key := make([]byte, keySize)
+	for col := 0; col < keySize; col++ {
+		for row := range column {
+			if row*keySize+col >= len(in) {
+				continue
+			}
+			column[row] = in[row*keySize+col]
+		}
+		_, k, _ := findSingleXORKey(column, c)
+		key[col] = k
+	}
+	return key
 }

@@ -48,7 +48,7 @@ func TestProblem3(t *testing.T) {
 	for char, val := range corpus {
 		t.Logf("%c:%.5f", char, val)
 	}
-	res, _ := findSingleXORKey(decodeHex(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"), corpus)
+	res, _, _ := findSingleXORKey(decodeHex(t, "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"), corpus)
 	t.Logf("%s", string(res))
 }
 func TestProblem4(t *testing.T) {
@@ -57,7 +57,7 @@ func TestProblem4(t *testing.T) {
 	var res []byte
 	for _, line := range strings.Split(string(text), "\n") {
 		line := decodeHex(t, line)
-		out, score := findSingleXORKey(line, corpus)
+		out, _, score := findSingleXORKey(line, corpus)
 		if score > BestScore {
 			res = out
 			BestScore = score
@@ -81,6 +81,9 @@ func TestProblem6(t *testing.T) {
 	}
 	text := decodeBase64(t, string(readFile(t, "6.txt")))
 	t.Log("likely size:", findRepeatXORSize(text))
+	key := findRepeatXORKey(text, corpus)
+	t.Logf("likely key: %q", key)
+	t.Logf("%s", repeatingXOR(text, key))
 }
 
 func decodeBase64(t *testing.T, s string) []byte {
