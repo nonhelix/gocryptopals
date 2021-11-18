@@ -118,3 +118,12 @@ func fatalIfErr(t *testing.T, err error) {
 		t.Fatal(err)
 	}
 }
+
+func TestProble8(t *testing.T) {
+	all := string(readFile(t, "8.txt"))
+	for i, hs := range strings.Split(all, "\n") {
+		if detectECB(decodeHex(t, hs), 16) {
+			t.Logf("ciphertext number %d is the encrypted with ECB", i+1)
+		}
+	}
+}
