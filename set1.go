@@ -1,6 +1,7 @@
 package cryptopals
 
 import (
+	"crypto/cipher"
 	"encoding/base64"
 	"encoding/hex"
 	"log"
@@ -116,4 +117,15 @@ func findRepeatXORKey(in []byte, c map[rune]float64) []byte {
 		key[col] = k
 	}
 	return key
+}
+
+func decryptECB(in []byte, b cipher.Block) []byte {
+	if len(in)%b.BlockSize() != 0 {
+		panic("decryptECB: length not a multiple of BlockSize")
+	}
+	out := make([]byte, len(in))
+	for i := 0; i < len(in); i += b.BlockSize() {
+		b.Decrypt(out[i:], in[i:])
+	}
+	return out
 }

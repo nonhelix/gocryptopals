@@ -2,6 +2,7 @@ package cryptopals
 
 import (
 	"bytes"
+	"crypto/aes"
 	"encoding/base64"
 	"encoding/hex"
 	"io/ioutil"
@@ -27,6 +28,7 @@ func TestProblem2(t *testing.T) {
 }
 
 func decodeHex(t *testing.T, s string) []byte {
+	t.Helper()
 	v, err := hex.DecodeString(s)
 	if err != nil {
 		t.Fatal("failed to decode hex", s)
@@ -87,6 +89,7 @@ func TestProblem6(t *testing.T) {
 }
 
 func decodeBase64(t *testing.T, s string) []byte {
+	t.Helper()
 	v, err := base64.StdEncoding.DecodeString(s)
 	if err != nil {
 		t.Fatal("failed to decode base64", s)
@@ -94,9 +97,24 @@ func decodeBase64(t *testing.T, s string) []byte {
 	return v
 }
 func readFile(t *testing.T, f string) []byte {
-	test, err := ioutil.ReadFile(f)
+	t.Helper()
+	text, err := ioutil.ReadFile(f)
 	if err != nil {
 		t.Fatal("cant open file")
 	}
-	return test
+	return text
+}
+func TestProblem7(t *testing.T) {
+	in := decodeBase64(t, string(readFile(t, "7.txt")))
+	c, err := aes.NewCipher([]byte("YELLOW SUBMARINE"))
+	fatalIfErr(t, err)
+	out := decryptECB(in, c)
+	t.Logf("%s", out)
+}
+
+func fatalIfErr(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
